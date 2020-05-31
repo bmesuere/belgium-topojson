@@ -44,7 +44,7 @@ const outputFile = "belgium.json";
     // merge population data
     row = populationData.find(row => row[0] === muni.properties.nis);
     if (row) {
-      muni.properties.population = row[4];
+      muni.properties.population = +row[4];
     }
 
     // remove unused properties
