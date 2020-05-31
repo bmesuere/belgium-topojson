@@ -6,14 +6,17 @@ const topoFile = 'source_data/fusies.json';
 // NIS codes
 const nisFile = "source_data/REFNIS_2019.csv";
 
+// population data
+const populationFile = "source_data/bevolking_per_gemeente.csv"
+
 // output file
 const outputFile = "belgium.json";
 
 (async function () {
   // read files
-
   const topojson = JSON.parse(await fs.readFile(topoFile));
   const nisData = (await fs.readFile(nisFile, "utf8")).split("\n").map(line => line.split(";"));
+  const populationData = (await fs.readFile(populationFile, "utf8")).split("\n").map(line => line.trim().split(","));
 
   // rename gemeentes to municipalities
   topojson.objects.municipalities = topojson.objects.Gemeenten;
@@ -31,13 +34,18 @@ const outputFile = "belgium.json";
 
     // merge the official names and nis code
     const name = muni.properties?.NAME_4?.toLowerCase();
-    nisData.forEach(row => {
-      if ([row[1], row[4]].map(n => n.toLowerCase()).includes(name)) {
-        muni.properties.nis = row[0];
-        muni.properties.name_fr = row[1];
-        muni.properties.name_nl = row[4];
-      }
-    });
+    let row = nisData.find(row => [row[1], row[4]].map(n => n.toLowerCase()).includes(name));
+    if (row) {
+      muni.properties.nis = row[0];
+      muni.properties.name_fr = row[1];
+      muni.properties.name_nl = row[4];
+    }
+
+    // merge population data
+    row = populationData.find(row => row[0] === muni.properties.nis);
+    if (row) {
+      muni.properties.population = row[4];
+    }
 
     // remove unused properties
     delete muni.properties.ISO;
