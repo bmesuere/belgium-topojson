@@ -32,6 +32,21 @@ const outputFile = "belgium.json";
     if (muni.properties?.NAME_4 === "Blegny") muni.properties.NAME_4 = "Blégny";
     if (muni.properties?.NAME_4 === "Fernlemont") muni.properties.NAME_4 = "Fernelmont";
 
+    // set the region
+    if (muni.properties?.NAME_1 === "Bruxelles") {
+      muni.properties.reg_nis = "04000";
+      muni.properties.reg_nl = "Brussels Hoofdstedelijk Gewest"
+      muni.properties.reg_fr = "Région de Bruxelles-Capitale"
+    } else if (muni.properties?.NAME_1 === "Wallonie") {
+      muni.properties.reg_nis = "03000";
+      muni.properties.reg_nl = "Waals Gewest"
+      muni.properties.reg_fr = "Région Walonne"
+    } else if (muni.properties?.NAME_1 === "Vlaanderen") {
+      muni.properties.reg_nis = "02000";
+      muni.properties.reg_nl = "Vlaams Gewest"
+      muni.properties.reg_fr = "Région Flamande"
+    }
+
     // merge the official names and nis code
     const name = muni.properties?.NAME_4?.toLowerCase();
     let row = nisData.find(row => [row[1], row[4]].map(n => n.toLowerCase()).includes(name));

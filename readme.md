@@ -4,6 +4,9 @@ The repository contains a topojson file (`belgium.json`) of the Belgian municipa
 - `nis`: NIS code
 - `name_nl`: name in Dutch
 - `name_fr`: name in French
+- `reg_nis`: NIS code of the region
+- `reg_nl`: region name in Dutch
+- `reg_fr`: region name in French
 - `population`: population on 01/01/2020
 
 ## Example
