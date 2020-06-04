@@ -42,6 +42,10 @@ The notebook at [https://observablehq.com/@bmesuere/topojson-example](https://ob
 
 ![example map](example_output.png)
 
+Another example using Leaflet and convert the topojson to geojson can be found in the examples dir. This allows you to project your map onto e.g. openstreetmap data to get an even better feeling of where the area's are located.
+
+![example map](examples/belgian_popdensity.png)
+
 ## Older versions
 The pre-2025 version of the map (581 municipalities, as they existed from 2019 through 2024, with population figures of 01/01/2020) is available at the [v2020 tag](https://github.com/bmesuere/belgium-topojson/blob/v2020/belgium.json).
 
