@@ -49,7 +49,7 @@ const outputFile = "belgium.json";
 
     // merge the official names and nis code
     const name = muni.properties?.NAME_4?.toLowerCase();
-    let row = nisData.find(row => [row[1], row[4]].map(n => n.toLowerCase()).includes(name));
+    let row = nisData.find(row => row[4].toLowerCase() == name) || nisData.find(row => row[1].toLowerCase() == name);
     if (row) {
       muni.properties.nis = row[0];
       muni.properties.name_fr = row[1];
