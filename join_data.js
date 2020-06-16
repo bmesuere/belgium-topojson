@@ -26,7 +26,7 @@ const outputFile = "belgium.json";
   delete topojson.objects.ARR;
   delete topojson.objects.Prov;
 
-  // iterate over all munis
+  // fix municipalities
   topojson.objects.municipalities.geometries.map(muni => {
     // manually fix the spelling in the original topojson file
     if (muni.properties?.NAME_4 === "Sint-Joost-ten-Noode") muni.properties.NAME_4 = "Sint-Joost-ten-Node";
@@ -35,6 +35,14 @@ const outputFile = "belgium.json";
     if (muni.properties?.NAME_4 === "Celles-lez-Tournai") muni.properties.NAME_4 = "Celles";
     if (muni.properties?.NAME_4 === "Blegny") muni.properties.NAME_4 = "Blégny";
     if (muni.properties?.NAME_4 === "Fernlemont") muni.properties.NAME_4 = "Fernelmont";
+    if (muni.properties?.NAME_2 === "Vlaams Brabant") muni.properties.NAME_2 = "Vlaams-Brabant";
+    if (muni.properties?.NAME_2 === "Brabant Wallon") muni.properties.NAME_2 = "Waals-Brabant";
+    if (muni.properties?.NAME_2 === "Hainaut") muni.properties.NAME_2 = "Henegouwen";
+    if (muni.properties?.NAME_2 === "Luxembourg") muni.properties.NAME_2 = "Luxemburg";
+    if (muni.properties?.NAME_3 === "Moeskroen") muni.properties.NAME_3 = "Tournai-Mouscron";
+    if (muni.properties?.NAME_3 === "Tournai") muni.properties.NAME_3 = "Tournai-Mouscron";
+    if (muni.properties?.NAME_3 === "Brussel") muni.properties.NAME_3 = "Brussel Hoofdstad";
+
 
     // set the region
     if (muni.properties?.NAME_1 === "Bruxelles") {
@@ -52,12 +60,35 @@ const outputFile = "belgium.json";
     }
 
     // merge the official names and nis code
-    const name = muni.properties?.NAME_4?.toLowerCase();
-    let row = nisData.find(row => row[4].toLowerCase() == name) || nisData.find(row => row[1].toLowerCase() == name);
+    let name_nl = muni.properties?.NAME_4?.toLowerCase();
+    let name_fr = muni.properties?.NAME_4?.toLowerCase();
+    let row = nisData.find(row => row[4].toLowerCase() == name_nl) || nisData.find(row => row[1].toLowerCase() == name_fr);
     if (row) {
       muni.properties.nis = row[0];
       muni.properties.name_fr = row[1];
       muni.properties.name_nl = row[4];
+    }
+
+    // merge the provinces
+    name_nl = "provincie " + muni.properties?.NAME_2?.toLowerCase();
+    name_fr = "province de " + muni.properties?.NAME_2?.toLowerCase();
+    row = nisData.find(row => row[4].toLowerCase() == name_nl) || nisData.find(row => row[1].toLowerCase() == name_fr);
+    if (row) {
+      muni.properties.prov_nis = row[0];
+      muni.properties.prov_fr = row[1];
+      muni.properties.prov_nl = row[4];
+    }
+
+    // merge the arrondissements
+    name_nl = "arrondissement " + muni.properties?.NAME_3?.toLowerCase();
+    name_fr = "arrondissement de " + muni.properties?.NAME_3?.toLowerCase();
+    let name_fr2 = "arrondissement d'" + muni.properties?.NAME_3?.toLowerCase();
+    row = nisData.find(row => row[4].toLowerCase() == name_nl) || nisData.find(row => row[1].toLowerCase() == name_fr) || nisData.find(row => row[1].toLowerCase() == name_fr2);
+    if (!row) { console.log(name_nl) }
+    if (row) {
+      muni.properties.arr_nis = row[0];
+      muni.properties.arr_fr = row[1];
+      muni.properties.arr_nl = row[4];
     }
 
     // merge population data
