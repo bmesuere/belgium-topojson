@@ -117,5 +117,118 @@ const outputFile = "belgium.json";
     delete muni.properties["NAME_2 - New"];
   });
 
+  // fix arrondissements
+  topojson.objects.arrondissements.geometries.map(arr => {
+    // manually fix the spelling in the original topojson file
+    if (arr.properties?.NAME_2 === "Vlaams Brabant") arr.properties.NAME_2 = "Vlaams-Brabant";
+    if (arr.properties?.NAME_2 === "Brabant Wallon") arr.properties.NAME_2 = "Waals-Brabant";
+    if (arr.properties?.NAME_2 === "Hainaut") arr.properties.NAME_2 = "Henegouwen";
+    if (arr.properties?.NAME_2 === "Luxembourg") arr.properties.NAME_2 = "Luxemburg";
+    if (arr.properties?.NAME_3 === "Moeskroen") arr.properties.NAME_3 = "Tournai-Mouscron";
+    if (arr.properties?.NAME_3 === "Tournai") arr.properties.NAME_3 = "Tournai-Mouscron";
+    if (arr.properties?.NAME_3 === "Brussel") arr.properties.NAME_3 = "Brussel Hoofdstad";
+
+
+    // set the region
+    if (arr.properties?.NAME_1 === "Bruxelles") {
+      arr.properties.reg_nis = "04000";
+      arr.properties.reg_nl = "Brussels Hoofdstedelijk Gewest"
+      arr.properties.reg_fr = "Région de Bruxelles-Capitale"
+    } else if (arr.properties?.NAME_1 === "Wallonie") {
+      arr.properties.reg_nis = "03000";
+      arr.properties.reg_nl = "Waals Gewest"
+      arr.properties.reg_fr = "Région Walonne"
+    } else if (arr.properties?.NAME_1 === "Vlaanderen") {
+      arr.properties.reg_nis = "02000";
+      arr.properties.reg_nl = "Vlaams Gewest"
+      arr.properties.reg_fr = "Région Flamande"
+    }
+
+    // merge the provinces
+    name_nl = "provincie " + arr.properties?.NAME_2?.toLowerCase();
+    name_fr = "province de " + arr.properties?.NAME_2?.toLowerCase();
+    row = nisData.find(row => row[4].toLowerCase() == name_nl) || nisData.find(row => row[1].toLowerCase() == name_fr);
+    if (row) {
+      arr.properties.prov_nis = row[0];
+      arr.properties.prov_fr = row[1];
+      arr.properties.prov_nl = row[4];
+    }
+
+    // merge the arrondissements
+    name_nl = "arrondissement " + arr.properties?.NAME_3?.toLowerCase();
+    name_fr = "arrondissement de " + arr.properties?.NAME_3?.toLowerCase();
+    let name_fr2 = "arrondissement d'" + arr.properties?.NAME_3?.toLowerCase();
+    row = nisData.find(row => row[4].toLowerCase() == name_nl) || nisData.find(row => row[1].toLowerCase() == name_fr) || nisData.find(row => row[1].toLowerCase() == name_fr2);
+    if (!row) { console.log(name_nl) }
+    if (row) {
+      arr.properties.nis = row[0];
+      arr.properties.name_fr = row[1];
+      arr.properties.name_nl = row[4];
+    }
+
+    // remove unused properties
+    delete arr.properties.ISO;
+    delete arr.properties.ID_0;
+    delete arr.properties.ID_1;
+    delete arr.properties.ID_2;
+    delete arr.properties.ID_3;
+    delete arr.properties.NAME_0;
+    delete arr.properties.NAME_1;
+    delete arr.properties.NAME_2;
+    delete arr.properties.NAME_3;
+    delete arr.properties.NAME_2_NEW;
+    delete arr.properties.NAME_3_NEW;
+  });
+
+
+  // fix provinces
+  topojson.objects.provinces.geometries.map(prov => {
+    // manually fix the spelling in the original topojson file
+    if (prov.properties?.NAME_2 === "Vlaams Brabant") prov.properties.NAME_2 = "Vlaams-Brabant";
+    if (prov.properties?.NAME_2 === "Brabant Wallon") prov.properties.NAME_2 = "Waals-Brabant";
+    if (prov.properties?.NAME_2 === "Hainaut") prov.properties.NAME_2 = "Henegouwen";
+    if (prov.properties?.NAME_2 === "Luxembourg") prov.properties.NAME_2 = "Luxemburg";
+
+
+    // set the region
+    if (prov.properties?.NAME_1 === "Bruxelles") {
+      prov.properties.reg_nis = "04000";
+      prov.properties.reg_nl = "Brussels Hoofdstedelijk Gewest"
+      prov.properties.reg_fr = "Région de Bruxelles-Capitale"
+    } else if (prov.properties?.NAME_1 === "Wallonie") {
+      prov.properties.reg_nis = "03000";
+      prov.properties.reg_nl = "Waals Gewest"
+      prov.properties.reg_fr = "Région Walonne"
+    } else if (prov.properties?.NAME_1 === "Vlaanderen") {
+      prov.properties.reg_nis = "02000";
+      prov.properties.reg_nl = "Vlaams Gewest"
+      prov.properties.reg_fr = "Région Flamande"
+    }
+
+    // merge the provinces
+    name_nl = "provincie " + prov.properties?.NAME_2?.toLowerCase();
+    name_fr = "province de " + prov.properties?.NAME_2?.toLowerCase();
+    row = nisData.find(row => row[4].toLowerCase() == name_nl) || nisData.find(row => row[1].toLowerCase() == name_fr);
+    if (row) {
+      prov.properties.nis = row[0];
+      prov.properties.name_fr = row[1];
+      prov.properties.name_nl = row[4];
+    }
+
+    // remove unused properties
+    delete prov.properties.ISO;
+    delete prov.properties.ID_0;
+    delete prov.properties.ID_1;
+    delete prov.properties.ID_2;
+    delete prov.properties.NAME_0;
+    delete prov.properties.NAME_1;
+    delete prov.properties.NAME_2;
+    delete prov.properties.TYPE_2;
+    delete prov.properties.ENGTYPE_2;
+    delete prov.properties.NL_NAME_2;
+    delete prov.properties.VARNAME_2;
+    delete prov.properties['NAME_2 - NEW'];
+  });
+
   await fs.writeFile(outputFile, JSON.stringify(topojson));
 }());
