@@ -1,5 +1,5 @@
-# Topojson file of Belgian municipalities
-The repository contains a topojson file (`belgium.json`) of the Belgian municipalities. For each city, these properties are available:
+# Topojson file of Belgian municipalities, arrondissements and provinces
+The repository contains a topojson file (`belgium.json`) of the Belgian municipalities, arrondissements and provinces. These objects and properties are available:
 
 - municipalities
   - `nis`: NIS code
@@ -15,6 +15,23 @@ The repository contains a topojson file (`belgium.json`) of the Belgian municipa
   - `arr_nl`: arrondissement name in Dutch
   - `arr_fr`: arrondissement name in French
   - `population`: population on 01/01/2020
+- arrondissements
+  - `nis`: NIS code
+  - `name_nl`: name in Dutch
+  - `name_fr`: name in French
+  - `reg_nis`: NIS code of the region
+  - `reg_nl`: region name in Dutch
+  - `reg_fr`: region name in French
+  - `prov_nis`: NIS code of the province
+  - `prov_nl`: province name in Dutch
+  - `prov_fr`: province name in French
+- provinces
+  - `nis`: NIS code
+  - `name_nl`: name in Dutch
+  - `name_fr`: name in French
+  - `reg_nis`: NIS code of the region
+  - `reg_nl`: region name in Dutch
+  - `reg_fr`: region name in French
 
 ## Example
 The notebook at [https://observablehq.com/@bmesuere/topojson-example](https://observablehq.com/@bmesuere/topojson-example) shows an example of how to use the topojson file in combination with Vega-lite. You can load the file directly from GitHub using this URL:[https://raw.githubusercontent.com/bmesuere/belgium-topojson/master/belgium.json](https://raw.githubusercontent.com/bmesuere/belgium-topojson/master/belgium.json).
