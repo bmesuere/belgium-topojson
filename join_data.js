@@ -35,6 +35,7 @@ const outputFile = "belgium.json";
     if (muni.properties?.NAME_4 === "Celles-lez-Tournai") muni.properties.NAME_4 = "Celles";
     if (muni.properties?.NAME_4 === "Blegny") muni.properties.NAME_4 = "Blégny";
     if (muni.properties?.NAME_4 === "Fernlemont") muni.properties.NAME_4 = "Fernelmont";
+    if (muni.properties?.NAME_4 === "Gingelom") muni.properties.NAME_1 = "Vlaanderen";
     if (muni.properties?.NAME_2 === "Vlaams Brabant") muni.properties.NAME_2 = "Vlaams-Brabant";
     if (muni.properties?.NAME_2 === "Brabant Wallon") muni.properties.NAME_2 = "Waals-Brabant";
     if (muni.properties?.NAME_2 === "Hainaut") muni.properties.NAME_2 = "Henegouwen";
