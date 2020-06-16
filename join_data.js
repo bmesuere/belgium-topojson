@@ -1,7 +1,7 @@
 const fs = require("fs/promises");
 
 // original topojson file
-const topoFile = 'source_data/fusies.json';
+const topoFile = 'temp/belgium.topo.json';
 
 // NIS codes
 const nisFile = "source_data/REFNIS_2019.csv";
@@ -20,7 +20,11 @@ const outputFile = "belgium.json";
 
   // rename gemeentes to municipalities
   topojson.objects.municipalities = topojson.objects.Gemeenten;
+  topojson.objects.arrondissements = topojson.objects.ARR;
+  topojson.objects.provinces = topojson.objects.Prov;
   delete topojson.objects.Gemeenten;
+  delete topojson.objects.ARR;
+  delete topojson.objects.Prov;
 
   // iterate over all munis
   topojson.objects.municipalities.geometries.map(muni => {
