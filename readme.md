@@ -38,6 +38,10 @@ The notebook at [https://observablehq.com/@bmesuere/topojson-example](https://ob
 
 ![example map](example_output.png)
 
+Another example using Leaflet and convert the topojson to geojson can be found in the examples dir. This allows you to project your map onto e.g. openstreetmap data to get an even better feeling of where the area's are located.
+
+![example map](examples/belgian_popdensity.png)
+
 ## Data sources
 The base map is taken from [arneh61](https://github.com/arneh61/Belgium-Map). While the geo-part of this map is great, the properties aren't that useful. Naming of the properties is all over the place and the nis code (needed to join with other data sources) isn't present.
 
