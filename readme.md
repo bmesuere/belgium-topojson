@@ -1,4 +1,8 @@
 # Topojson file of Belgian municipalities, arrondissements and provinces
+
+> [!NOTE]
+> **Updated in August 2026.** The map is now generated from Statbel open data and reflects the municipal mergers of 1 January 2025 (581 → 565 municipalities, with new NIS codes for the merged municipalities), with population figures of 01/01/2026. The previous version is still available at the [v2020 tag](https://github.com/bmesuere/belgium-topojson/tree/v2020).
+
 The repository contains a topojson file (`belgium.json`) of the Belgian municipalities, arrondissements and provinces. The boundaries reflect the administrative situation on **01/01/2025** (565 municipalities, after the 2025 municipal mergers). These objects and properties are available:
 
 - municipalities
