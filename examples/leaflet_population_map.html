@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Population of the Belgian municipalities</title>
+
+    <!--add Leaflet CSS-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""/>
+
+    <!--our own style rules-->
+    <style>
+      body, html { height: 100%; margin: 0; }
+      #map-container { height: 100%; }
+      /* the default OpenStreetMap tiles are quite colorful, desaturating them
+         keeps the choropleth readable */
+      .leaflet-tile-pane { filter: grayscale(1); }
+      .info {
+        padding: 6px 8px;
+        font: 14px/16px Arial, Helvetica, sans-serif;
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+      }
+      .info h4 { margin: 0 0 5px; color: #777; }
+      .legend { text-align: left; line-height: 18px; color: #555; }
+      .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
+    </style>
+  </head>
+  <body>
+
+    <!--The div in which the map will be created-->
+    <div id="map-container"></div>
+
+    <!--load leaflet.js-->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""></script>
+
+    <!--we need the topojson library as well-->
+    <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"
+      integrity="sha256-Jc0CrkhsxQY+AhWk5M+xXeg3AMh6xIusTVfcaq8+u4k="
+      crossorigin=""></script>
+
+    <!--our own code to create the map-->
+    <script>
+      const DATA_URL = 'https://raw.githubusercontent.com/bmesuere/belgium-topojson/master/belgium.json';
+
+      const map = L.map('map-container').setView([50.5, 4.6], 8);
+
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+      }).addTo(map);
+
+      // extend Leaflet with a layer that takes a topojson file and converts it to geojson
+      L.TopoJSON = L.GeoJSON.extend({
+        addData: function (data) {
+          if (data.type !== 'Topology') {
+            return L.GeoJSON.prototype.addData.call(this, data);
+          }
+          // belgium.json contains three objects (municipalities, arrondissements and
+          // provinces) that cover the same area, so adding them all would stack three
+          // layers on top of each other. The `objects` option picks the ones we want.
+          const names = this.options.objects || Object.keys(data.objects);
+          for (const name of names) {
+            L.GeoJSON.prototype.addData.call(this, topojson.feature(data, data.objects[name]));
+          }
+          return this;
+        }
+      });
+      L.topoJson = (data, options) => new L.TopoJSON(data, options);
+
+      // color scale for the population, roughly logarithmic
+      const BUCKETS = [1000, 2000, 5000, 10000, 20000, 50000, 100000];
+      const COLORS = ['#FFEDA0', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'];
+
+      function getColor(population) {
+        if (population === undefined) return 'white';
+        let i = 0;
+        while (i < BUCKETS.length && population >= BUCKETS[i]) i++;
+        return COLORS[i];
+      }
+
+      function style(feature) {
+        return {
+          weight: 1,
+          opacity: 1,
+          color: 'gray',
+          dashArray: '3',
+          fillOpacity: 0.7,
+          fillColor: getColor(feature.properties.population)
+        };
+      }
+
+      function highlightFeature(e) {
+        e.target.setStyle({ weight: 4, color: '#666', dashArray: '' });
+        e.target.bringToFront();
+        info.update(e.target.feature.properties);
+      }
+
+      function resetHighlight(e) {
+        municipalities.resetStyle(e.target);
+        info.update();
+      }
+
+      function onEachFeature(feature, layer) {
+        layer.on({ mouseover: highlightFeature, mouseout: resetHighlight });
+      }
+
+      const municipalities = L.topoJson(null, {
+        objects: ['municipalities'],
+        style: style,
+        onEachFeature: onEachFeature
+      }).addTo(map);
+
+      fetch(DATA_URL)
+        .then(response => response.json())
+        .then(data => municipalities.addData(data));
+
+      // control that shows info on hover
+      const info = L.control();
+
+      info.onAdd = function () {
+        this._div = L.DomUtil.create('div', 'info');
+        this.update();
+        return this._div;
+      };
+
+      info.update = function (props) {
+        this._div.innerHTML = '<h4>Population per municipality</h4>' + (props
+          ? '<b>' + props.name_nl + '</b><br />' + props.population.toLocaleString('nl-BE') + ' inhabitants'
+          : 'Hover over a municipality');
+      };
+
+      info.addTo(map);
+
+      // legend with one entry per bucket
+      const legend = L.control({ position: 'bottomright' });
+
+      legend.onAdd = function () {
+        const div = L.DomUtil.create('div', 'info legend');
+        const labels = [];
+        for (let i = 0; i < COLORS.length; i++) {
+          const from = i === 0 ? 0 : BUCKETS[i - 1];
+          const to = BUCKETS[i];
+          labels.push('<i style="background:' + COLORS[i] + '"></i> ' + from + (to ? '&ndash;' + to : '+'));
+        }
+        div.innerHTML = labels.join('<br>');
+        return div;
+      };
+
+      legend.addTo(map);
+    </script>
+  </body>
+</html>
